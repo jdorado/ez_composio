@@ -1,0 +1,16 @@
+services:
+  broker:
+    build:
+      context: .
+      target: broker
+    restart: unless-stopped
+    ports: ["127.0.0.1:8080:8080"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    volumes:
+      - ${EZ_COMPOSIO_BROKER_CONFIG:?Set an absolute private config path}:/run/secrets/broker.json:ro
+      - receipts:/state
+volumes:
+  receipts:

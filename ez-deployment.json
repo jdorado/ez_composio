@@ -1,0 +1,1 @@
+{"schemaVersion":2,"services":{"plugin":{"buildTarget":"runtime","volumes":{"profile":"/state"},"healthcheck":["node","/app/src/cli.mjs","--version"],"memoryMiB":128}},"commands":{"composio":{"service":"plugin","argv":["node","/app/src/cli.mjs"]}}}
