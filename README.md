@@ -18,6 +18,12 @@ The broker is separate from the relay and is not installed in an agent container
 
 ## Install through Ez
 
+Ez's agent-led setup preinstalls this separate, removable bridge and supplies
+private broker enrollment. Provider accounts connect when the user requests a
+service. The agent can discover Gmail from “open my Gmail” without requiring
+the user to name Composio. Installed state is read from the registry; uninstall
+is respected and does not trigger automatic reinstallation.
+
 Inspect this checkout with the existing manager:
 `ez plugins inspect composio --source /absolute/ez_composio`.
 Review it, then use the returned source/revision with `ez plugins catalog-add`
@@ -25,9 +31,18 @@ and `ez plugins install composio`. `ez plugins start composio` starts its inert
 container. The manager generates Compose and registers the skill automatically.
 No Google or Composio accounts are connected by installation.
 
-The operator privately supplies enrollment JSON on stdin:
+The installing agent handles the operator steps below on the owner's behalf.
+The owner is not expected to find another administrator or prepare enrollment.
+If the project API key is missing, ask them to provide it from
+[Composio Dashboard](https://dashboard.composio.dev), Platform → project →
+Settings → API Keys. Handle all technical setup and verification after receipt.
+Keep the key in private broker configuration, never echo it or put it in argv,
+logs, repository files or agent Markdown. A private conversation may receive the
+requested key; do not claim that conversation history is a secret vault.
+
+The installing agent privately imports generated enrollment JSON on stdin:
 `ez composio init < /private/enrollment.secret.json`.
-Do not paste tokens in chat. Init atomically stores only broker/token in
+Do not expose generated enrollment tokens in chat. Init atomically stores only broker/token in
 `/state/connection.json` (0600). Use `ez composio --help`, `doctor`,
 `search 'Find a HubSpot contact'`, `connect hubspot work`, then search again.
 Execute an action slug from discovery using JSON stdin:
@@ -54,7 +69,8 @@ binding fragment and enrollment into a new private directory, and prints no secr
 Merge that fragment into the broker config's `agents` map, preserving others.
 The broker rereads the file per request; removing a binding revokes the client.
 Use a distinct Composio user ID per agent to avoid ambient cross-agent accounts.
-Provisioning is operator-only. Never distribute the project key or this config.
+Provisioning runs in the trusted setup environment, including an installing agent
+acting for the owner. Never distribute the project key or this config to clients.
 An application's existing login can later authorize this provisioning operation;
 the client does not claim to validate Privy sessions itself.
 
