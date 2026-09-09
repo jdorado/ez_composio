@@ -1,5 +1,6 @@
 // Synthetic Docker-only provider. All network requests are intercepted.
 globalThis.fetch=async(url,options)=>{
+  if(url==='https://backend.composio.dev/api/v3.1/files/upload/request')return new Response(JSON.stringify({key:'synthetic-object',type:'existing'}));
   if(!url.startsWith('https://backend.composio.dev/api/v3.1/tool_router/session'))throw Error('Unexpected provider URL');
   if(url.endsWith('/session'))return new Response(JSON.stringify({session_id:'trs_synthetic'}));
   if(url.includes('/toolkits'))return new Response(JSON.stringify({items:[],total_items:0,next_cursor:null}));

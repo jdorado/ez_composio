@@ -28,6 +28,12 @@ export function route(command,body) {
   }
   if(command==='search') {fields(body,['query']);return ['search',{queries:[{use_case:str(body.query)}],search_strategy:'tool_search'}];}
   if(command==='connect') {fields(body,['toolkit','alias']);if(!/^[a-z0-9_-]+$/.test(str(body.toolkit)))throw Error('Invalid toolkit');return ['link',{toolkit:body.toolkit,...(body.alias?{alias:str(body.alias)}:{})}];}
+  if(command==='file-upload-request') {
+    fields(body,['key','toolkit_slug','tool_slug','filename','mimetype','md5']);str(body.key);
+    if(!/^[a-z0-9_-]+$/.test(str(body.toolkit_slug)) || !/^[A-Z][A-Z0-9_]+$/.test(str(body.tool_slug)) || body.tool_slug.startsWith('COMPOSIO_'))throw Error('Invalid tool');
+    if(!/^[a-f0-9]{32}$/.test(str(body.md5)) || /[\/\\\x00-\x1f]/.test(str(body.filename)) || !/^[a-zA-Z0-9.+-]+\/[a-zA-Z0-9.+-]+$/.test(str(body.mimetype)))throw Error('Invalid file metadata');
+    const {key,...metadata}=body;return ['file-upload-request',metadata];
+  }
   if(command==='execute') {
     fields(body,['tool','arguments','account','key']);str(body.key);
     if(!/^[A-Z][A-Z0-9_]+$/.test(str(body.tool))||body.tool.startsWith('COMPOSIO_'))throw Error('Use an app tool discovered by search');
@@ -59,11 +65,11 @@ export function server(load,fetcher=fetch) {
       try {spec=route(req.url.slice(1),body);}catch {return send(400,{error:'Invalid command or fields'});}
       if(!/^trs_[a-zA-Z0-9_-]+$/.test(principal.session))throw Error('Invalid server session binding');
       const [action,payload]=spec;
-      const url='https://backend.composio.dev/api/v3.1/tool_router/session/'+principal.session+'/'+action;
+      const url=action==='file-upload-request' ? 'https://backend.composio.dev/api/v3.1/files/upload/request' : 'https://backend.composio.dev/api/v3.1/tool_router/session/'+principal.session+'/'+action;
       const headers={'x-api-key':config.apiKey};
       let receipt;
-      if(action==='execute') {
-        const file=receiptPath(body.key);const fingerprint=digest(JSON.stringify(payload));
+      if(action==='execute'||action==='file-upload-request') {
+        const file=receiptPath(body.key);const fingerprint=digest((action==='file-upload-request'?'file-upload-request:':'')+JSON.stringify(payload));
         await mkdir(join(config.receiptsDirectory,digest(token)),{recursive:true,mode:0o700});
         receipt={file,value:{key:body.key,fingerprint,status:'uncertain',createdAt:new Date().toISOString()}};
         try {await writeFile(file,JSON.stringify(receipt.value),{flag:'wx',mode:0o600});}

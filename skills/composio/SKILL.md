@@ -78,3 +78,17 @@ Diagnose network failures yourself; reprovision revoked/expired sessions using
 the owner's authorized setup access. Do not silently retry or switch accounts. Uninstall via
 the manager preserves the private profile; authorized revocation removes the broker binding
 to revoke this client. Provider account disconnection is a separate explicit act.
+
+
+For local binary files, use native `file-upload-request` with JSON containing
+`key`, `toolkit_slug`, `tool_slug`, `filename`, `mimetype`, and the bytes' `md5`.
+This exposes Composio's files/upload/request endpoint; the project key remains
+in the broker. Read the returned receipt. For a new object, PUT exact file bytes
+to its returned HTTPS presigned URL using an available HTTP client, with the
+matching Content-Type and no broker or project credentials. Keep signed URLs
+private; do not log them in shared notes. A reused object may need no PUT.
+Then pass the returned key as `file_to_upload.s3key` with name and mimetype to
+the discovered app tool, using a separate stable execution key and explicit
+account. Staging alone is not delivery to Drive or another provider. Verify the
+final object's parent, bytes/hash and stable ID. Reconcile uncertain requests;
+do not automatically refresh an expired URL or replay an uncertain app write.

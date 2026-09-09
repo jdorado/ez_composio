@@ -61,3 +61,26 @@ test('provider failure is not retried or exposed in errors',async t=>{
   assert.equal(r.status,502);assert.equal(calls,1);assert.ok(!(await r.text()).includes('SECRET'));
   const retry=await fetch(url,options);assert.equal((await retry.json()).status,'uncertain');assert.equal(calls,1);
 });
+
+test('native upload requests keep credentials and receipts scoped, preserve metadata, and never replay uncertain requests',async t=>{
+  const dir=await mkdtemp(join(tmpdir(),'ez-composio-upload-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+  const a='d'.repeat(64),b='e'.repeat(64);let calls=0,fail=false;
+  const config={apiKey:'PRIVATE_KEY',receiptsDirectory:dir,agents:{[digest(a)]:{session:'trs_a'},[digest(b)]:{session:'trs_b'}}};
+  const metadata={key:'upload',toolkit_slug:'googledrive',tool_slug:'GOOGLEDRIVE_CREATE_FILE',filename:'empty.pdf',mimetype:'application/pdf',md5:'d41d8cd98f00b204e9800998ecf8427e'};
+  const s=server(async()=>config,async(url,options)=>{
+    calls++;assert.equal(url,'https://backend.composio.dev/api/v3.1/files/upload/request');
+    assert.equal(options.headers['x-api-key'],'PRIVATE_KEY');
+    const {key,...native}=metadata;assert.deepEqual(JSON.parse(options.body),native);
+    if(fail)throw Error('PRIVATE_KEY');
+    return new Response(JSON.stringify({key:'native-object',type:'new',new_presigned_url:'https://synthetic.example/upload'}));
+  });s.listen(0,'127.0.0.1');await once(s,'listening');t.after(()=>s.close());
+  const origin='http://127.0.0.1:'+s.address().port;
+  const invoke=(token,command,body)=>fetch(origin+'/'+command,{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify(body)});
+  let r=await invoke(a,'file-upload-request',metadata);assert.equal(r.status,200);let receipt=await r.json();assert.equal(receipt.status,'returned');assert.equal(receipt.result.key,'native-object');assert.ok(!JSON.stringify(receipt).includes('PRIVATE_KEY'));
+  await invoke(a,'file-upload-request',metadata);assert.equal(calls,1);
+  assert.equal((await invoke(b,'operation',{key:'upload'})).status,404);
+  assert.equal((await invoke(a,'file-upload-request',{...metadata,filename:'different.pdf'})).status,409);
+  for(const change of [{filename:'../escape'},{md5:'bad'},{toolkit_slug:'../other'},{session:'trs_b'},{url:'https://evil.example'}])assert.equal((await invoke(a,'file-upload-request',{...metadata,...change})).status,400);
+  fail=true;assert.equal((await invoke(b,'file-upload-request',metadata)).status,502);
+  assert.equal((await (await invoke(b,'file-upload-request',metadata)).json()).status,'uncertain');assert.equal(calls,2);
+});

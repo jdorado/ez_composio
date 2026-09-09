@@ -29,7 +29,7 @@ async function install(){
 }
 try {
   await install();
-  assert.equal(ez(['composio','--version']).version,'0.1.0-beta.1');
+  assert.equal(ez(['composio','--version']).version,'0.1.0-beta.2');
   operator(['src/configure.mjs','key','/state/broker.secret.json'],JSON.stringify({apiKey:'synthetic'}));
   operator(['src/provision.mjs','/state/broker.secret.json','/state/enrollment'],JSON.stringify({userId:'synthetic',broker:'unix:///ipc/composio.sock'}));
   const binding=dc(['exec','-T','broker','cat','/state/enrollment/binding.secret.json']);
@@ -38,6 +38,7 @@ try {
   ez(['composio','init'],enrollment);
   assert.equal(ez(['composio','doctor']).total_items,0);
   assert.equal(ez(['composio','toolkits'],JSON.stringify({limit:1})).total_items,0);
+  assert.equal(ez(['composio','file-upload-request'],JSON.stringify({key:'synthetic-upload',toolkit_slug:'googledrive',tool_slug:'GOOGLEDRIVE_CREATE_FILE',filename:'empty.txt',mimetype:'text/plain',md5:'d41d8cd98f00b204e9800998ecf8427e'})).result.key,'synthetic-object');
   assert.ok(ez(['composio','search','calendar']).results);
   assert.ok(ez(['composio','schemas','GMAIL_FETCH_EMAILS']).data);
   ez(['plugins','stop','composio']);ez(['plugins','start','composio']);assert.equal(ez(['composio','doctor']).total_items,0);
