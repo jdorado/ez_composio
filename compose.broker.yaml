@@ -10,7 +10,7 @@ services:
     security_opt: [no-new-privileges:true]
     mem_limit: 256m
     volumes:
-      - ${EZ_COMPOSIO_BROKER_CONFIG:?Set an absolute private config path}:/run/secrets/broker.json:ro
+      - ${EZ_COMPOSIO_BROKER_DIRECTORY:?Set an absolute private config directory}:/run/secrets:ro
       - receipts:/state
 volumes:
   receipts:

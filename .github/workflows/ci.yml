@@ -1,0 +1,35 @@
+name: verify
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts && npm run verify && npm run release:check
+      - run: git diff --check
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/checkout@v4
+        with:
+          repository: jdorado/ez-agents
+          ref: 51dbc778fc7e598142ecddcc1e9c4eab6c1abab4
+          path: .qa-manager
+      - name: Packed manager install and private broker QA
+        run: |
+          candidate_dir="$(mktemp -d)"
+          npm pack --ignore-scripts --pack-destination "$candidate_dir"
+          tar -xzf "$candidate_dir"/*.tgz -C "$candidate_dir"
+          EZ_COMPOSIO_TEST_MANAGER="$PWD/.qa-manager/bin/ezenciel-agents-tools.mjs" node test/docker-smoke.mjs "$candidate_dir/package"

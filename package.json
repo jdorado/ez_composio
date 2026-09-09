@@ -1,1 +1,43 @@
-{"name":"ez-composio","version":"0.1.0","type":"module","license":"MIT","engines":{"node":">=22"},"scripts":{"verify":"node --test test/*.test.mjs","test":"node --test test/*.test.mjs"},"files":["src","bin","skills","README.md","LICENSE","compose.broker.yaml"]}
+{
+  "name": "@jc_stack/ez-composio",
+  "version": "0.1.0-beta.1",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "verify": "node --test test/*.test.mjs",
+    "test": "node --test test/*.test.mjs",
+    "release:check": "node scripts/release-check.mjs"
+  },
+  "files": [
+    "src",
+    "bin",
+    "skills",
+    "README.md",
+    "LICENSE",
+    "compose.broker.yaml",
+    "Dockerfile",
+    ".dockerignore",
+    "ez-plugin.json",
+    "ez-deployment.json",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+    "scripts/release-check.mjs"
+  ],
+  "description": "Agent-bound Composio discovery, OAuth and native actions for Ez",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdorado/ez_composio.git"
+  },
+  "homepage": "https://github.com/jdorado/ez_composio#readme",
+  "bugs": {
+    "url": "https://github.com/jdorado/ez_composio/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
+  }
+}

@@ -45,7 +45,7 @@ test('CLI through broker preserves native arguments, pins tenant and keeps key s
   assert.equal(calls.length,before);
 });
 test('paths and helper execution cannot escape session; explicit account is required',()=>{
-  for(const tool of ['../sessions','COMPOSIO_MULTI_EXECUTE_TOOL','COMPOSIO_REMOTE_WORKBENCH']) assert.throws(()=>route('execute',{tool,arguments:{},account:'work'}));
+  for(const tool of ['../sessions','COMPOSIO_MULTI_EXECUTE_TOOL','COMPOSIO_REMOTE_WORKBENCH']) assert.throws(()=>route('execute',{tool,arguments:{},account:'work',key:'negative'}));
   assert.throws(()=>route('execute',{tool:'GMAIL_SEARCH',arguments:{}}));
   assert.throws(()=>route('connect',{toolkit:'../gmail'}));
   for(const url of ['http://example.com','https://user:secret@example.com','https://example.com/path','https://example.com?token=secret'])assert.throws(()=>endpoint(url));
