@@ -7,7 +7,7 @@ searchable; availability and managed OAuth support depend on Composio.
 
 ## Architecture
 
-Agent CLI → HTTPS broker → agent-bound Composio session → connected provider.
+Agent CLI → private IPC broker (or hosted HTTPS) → agent-bound Composio session → connected provider.
 The public plugin contains no shared API key. The instance operator hosts the
 broker and owns its Composio project, billing and data-processing relationship.
 Composio stores Google/provider tokens. The client stores an agent credential in
@@ -104,7 +104,8 @@ The same client supports an HTTPS broker instead of private IPC. Run
 configuration directory containing broker.json. Mount the directory, not the
 single file: atomic config updates must become visible to the running process.
 The directory/file must be readable by container UID 1000 (0700/0600); configure
-it through the container as that UID. Keep receipts in its private volume.
+it with a separate setup container mounting that directory writable as UID 1000;
+the production broker mounts it read-only. Keep receipts in its private volume.
 The config shape is `{"apiKey":"...","receiptsDirectory":"/state/receipts","agents":{}}`.
 Put an HTTPS reverse proxy with operator rate limits in front of its loopback
 port 8080. Do not log authorization, request bodies or consent links. No hosted
