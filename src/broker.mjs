@@ -1,6 +1,6 @@
 import {createServer} from 'node:http';
 import {createHash} from 'node:crypto';
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,chmod,unlink} from 'node:fs/promises';
 import {join,isAbsolute} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {readJSON,request,save} from './io.mjs';
@@ -9,6 +9,23 @@ const fields=(body,allowed)=>{if(!body||Array.isArray(body)||typeof body!=='obje
 const str=(v)=>{if(typeof v!=='string'||!v.length||v.length>4000)throw Error('Expected bounded string');return v;};
 export function route(command,body) {
   if(command==='doctor') {fields(body,[]);return ['toolkits',undefined];}
+  if(command==='toolkits') {
+    fields(body,['search','cursor','limit','toolkits','is_connected']);
+    const query=new URLSearchParams();
+    for(const [key,value] of Object.entries(body)) {
+      if(key==='limit') {if(!Number.isInteger(value)||value<1||value>50)throw Error('Invalid limit');}
+      else if(key==='is_connected') {if(typeof value!=='boolean')throw Error('Invalid connection filter');}
+      else if(key==='toolkits') {if(!Array.isArray(value)||!value.length||value.length>50||value.some(v=>typeof v!=='string'||! /^[a-z0-9_-]+$/.test(v)))throw Error('Invalid toolkit slugs');}
+      else str(value);
+      query.set(key,Array.isArray(value)?value.join(','):String(value));
+    }
+    return ['toolkits?'+query,undefined];
+  }
+  if(command==='schemas') {
+    fields(body,['tools']);
+    if(!Array.isArray(body.tools)||!body.tools.length||body.tools.length>20||body.tools.some(v=>typeof v!=='string'||! /^[A-Z][A-Z0-9_]+$/.test(v)||v.startsWith('COMPOSIO_')))throw Error('Invalid tool slugs');
+    return ['execute_meta',{slug:'COMPOSIO_GET_TOOL_SCHEMAS',arguments:{tool_slugs:body.tools}}];
+  }
   if(command==='search') {fields(body,['query']);return ['search',{queries:[{use_case:str(body.query)}],search_strategy:'tool_search'}];}
   if(command==='connect') {fields(body,['toolkit','alias']);if(!/^[a-z0-9_-]+$/.test(str(body.toolkit)))throw Error('Invalid toolkit');return ['link',{toolkit:body.toolkit,...(body.alias?{alias:str(body.alias)}:{})}];}
   if(command==='execute') {
@@ -72,7 +89,11 @@ export function server(load,fetcher=fetch) {
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   const file=process.argv[2];if(!file)throw Error('Private broker config path required');
-  const s=server(async()=>JSON.parse(await readFile(file,'utf8')));
+  const s=server(async()=>readJSON([await readFile(file)]));
   s.requestTimeout=35000;s.headersTimeout=10000;
-  s.listen(8080,'0.0.0.0');
+  if(process.argv[3]==='--socket') {
+    const socket='/ipc/composio.sock';
+    await unlink(socket).catch(e=>{if(e.code!=='ENOENT')throw e;});
+    s.listen(socket,()=>chmod(socket,0o600).catch(()=>{s.close();process.exitCode=1;}));
+  } else s.listen(8080,'0.0.0.0');
 }

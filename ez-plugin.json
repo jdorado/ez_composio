@@ -1,1 +1,21 @@
-{"schemaVersion":1,"id":"composio","version":"0.1.0","description":"Discover, connect and execute Composio tools on demand through an agent-bound hosted connection","commands":{"composio":{"executable":"bin/ez-composio","args":[]}},"skills":["skills/composio/SKILL.md"]}
+{
+  "schemaVersion": 1,
+  "id": "composio",
+  "version": "0.1.0-beta.1",
+  "description": "Discover, connect and execute Composio tools on demand through an agent-bound hosted connection",
+  "commands": {
+    "composio": {
+      "executable": "bin/ez-composio",
+      "args": [],
+      "exposure": {
+        "receivesExternalContent": true,
+        "sendsExternally": true,
+        "changesRecords": true,
+        "requiresReview": true
+      }
+    }
+  },
+  "skills": [
+    "skills/composio/SKILL.md"
+  ]
+}

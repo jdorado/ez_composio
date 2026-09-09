@@ -1,0 +1,12 @@
+import {spawnSync} from 'node:child_process';
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const pkg=JSON.parse(await readFile('package.json'));
+const manifest=JSON.parse(await readFile('ez-plugin.json'));
+assert.equal(pkg.version,manifest.version);
+assert.equal(Object.keys(pkg.dependencies||{}).length,0);
+const p=spawnSync('npm',['pack','--dry-run','--ignore-scripts','--json'],{encoding:'utf8'});
+assert.equal(p.status,0,p.stderr);const files=JSON.parse(p.stdout)[0].files.map(f=>f.path);
+for(const name of ['Dockerfile','.dockerignore','ez-plugin.json','ez-deployment.json','src/configure.mjs','skills/composio/SKILL.md','LICENSE'])assert.ok(files.includes(name),'Missing '+name);
+assert.ok(!files.some(f=>/secret|enrollment|node_modules|\.git\//.test(f)));
+console.log('Release package contents and version verified');

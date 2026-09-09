@@ -11,7 +11,7 @@ if(typeof userId!=='string'||!userId.length)throw Error('Explicit stable user+ag
 endpoint(broker);
 // New directory prevents accidental overwriting; operator merges binding into config.
 await mkdir(outputDir,{mode:0o700});
-const config=JSON.parse(await readFile(configFile,'utf8'));
+const config=await readJSON([await readFile(configFile)]);
 const session=await request('https://backend.composio.dev/api/v3.1/tool_router/session',{'x-api-key':config.apiKey},{user_id:userId,workbench:{enable:false},execute:{enable_multi_execute:false},multi_account:{enable:true,require_explicit_selection:true}});
 if(!/^trs_[a-zA-Z0-9_-]+$/.test(session.session_id))throw Error('Provider did not return a session ID');
 const token=randomBytes(32).toString('hex');
