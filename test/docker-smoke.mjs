@@ -4,6 +4,7 @@ import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
 import assert from 'node:assert/strict';
+process.umask(0o077);
 const manager=process.env.EZ_COMPOSIO_TEST_MANAGER;
 if(!manager)throw Error('Set EZ_COMPOSIO_TEST_MANAGER to a reviewed Ez manager entrypoint');
 const source=resolve(process.argv[2]||'.');
@@ -29,7 +30,7 @@ async function install(){
 }
 try {
   await install();
-  assert.equal(ez(['composio','--version']).version,'0.1.0-beta.2');
+  assert.equal(ez(['composio','--version']).version,'0.1.0-beta.2.qa.1');
   operator(['src/configure.mjs','key','/state/broker.secret.json'],JSON.stringify({apiKey:'synthetic'}));
   operator(['src/provision.mjs','/state/broker.secret.json','/state/enrollment'],JSON.stringify({userId:'synthetic',broker:'unix:///ipc/composio.sock'}));
   const binding=dc(['exec','-T','broker','cat','/state/enrollment/binding.secret.json']);
