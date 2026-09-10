@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-beta.3
+
+- Adopt latest-tag publication and the corrected shared publisher main-CI selection. Runtime behavior and provider credentials are unchanged.
+- Testing beta; previously documented live-provider and fresh-host acceptance limits remain.
+
 ## 0.1.0-beta.2
 
 - Expose native file upload requests with private per-agent operation receipts, enabling binary provider uploads without exporting credentials.
