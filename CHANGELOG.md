@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-beta.2 — unreleased
+
+- Expose native file upload requests with private per-agent operation receipts, enabling binary provider uploads without exporting credentials.
+
 ## 0.1.0-beta.1
 
 First packaged beta: agent-owned key setup and session enrollment, private

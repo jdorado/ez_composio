@@ -1,6 +1,6 @@
 {
   "name": "@jc_stack/ez-composio",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2.qa.1",
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -39,5 +39,11 @@
   "publishConfig": {
     "access": "public",
     "tag": "beta"
+  },
+  "ezRelease": {
+    "protocol": 1,
+    "kind": "plugin",
+    "stateSchema": 1,
+    "mainProtocol": 1
   }
 }

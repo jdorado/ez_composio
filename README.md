@@ -152,3 +152,14 @@ Provider contract: [Composio sessions v3.1](https://docs.composio.dev/reference/
 [execute](https://docs.composio.dev/reference/api-reference/tool-router/postToolRouterSessionBySessionIdExecute).
 Checked September 9, 2026. Composio is an external hosted dependency; publishing
 this source does not make the hosted service self-hosted or free without limits.
+
+
+### Native file staging
+
+`file-upload-request` forwards native `toolkit_slug`, `tool_slug`, `filename`,
+`mimetype`, and `md5` metadata to Composio's upload-request API, with a private
+operation `key`. The client receives a presigned upload reference without the
+project credential. An agent uses an HTTP client to PUT the exact bytes, then
+supplies the reference to a discovered provider action. No local paths are read
+by the broker and no Drive-specific transfer or synchronization is implemented.
+See the packaged skill and https://docs.composio.dev/reference/api-reference/files.
