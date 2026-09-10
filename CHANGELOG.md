@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.1.0-beta.2 — unreleased
+## 0.1.0-beta.2
 
 - Expose native file upload requests with private per-agent operation receipts, enabling binary provider uploads without exporting credentials.
+- Keep credentials broker-side, validate native upload metadata, and retain
+  uncertain outcomes without automatic provider-write replay.
+- Preserve private installer file access and make verified shipping proactive
+  and agent-owned. Fresh-host OAuth/reboot acceptance remains pending.
 
 ## 0.1.0-beta.1
 
