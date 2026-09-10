@@ -32,3 +32,41 @@ reviewed artifact as beta, attach its SHA-256 to the matching GitHub prerelease,
 and download/read back the published artifact. Never replace a published version.
 Native Node built-ins only; no third-party runtime dependencies. Docker base image
 components retain their own licenses. No public container image is published here.
+
+## Shared beta publisher
+
+`.github/workflows/publish-beta.yml` is a generated caller of the reviewed,
+SHA-pinned shared publisher in `jdorado/ez-agents`. Keep the reusable workflow
+reference and `publisher-sha` on the same full commit; regenerate through a
+reviewed PR when upgrading. Required checks are `verify` and `docker` from
+`.github/workflows/ci.yml`, successful on the exact source commit's push to
+`main`. Review the check list whenever CI policy changes.
+
+Follow the [shared publishing procedure](https://github.com/jdorado/ez-agents/blob/main/docs/trusted-publishing.md)
+for caller regeneration, receipt fields, dispatch and failure reconciliation.
+Complete this repository's contribution checks, packed installation QA and
+independent review before release. Stage the exact tested tarball as
+`candidate.tgz` with `release-receipt.json` on a draft prerelease `vVERSION`,
+whose tag resolves to the tested current `main` commit. The receipt binds
+`jdorado/ez_composio`, `@jc_stack/ez-composio`, version, full source SHA,
+SHA-256 and public independent-review/test evidence URLs. Dispatch the caller
+on `main` with the numeric draft release ID, version, source SHA and independently
+verified SHA-256. Actions validates and publishes those bytes without rebuilding.
+Only `X.Y.Z-beta.N` and the `beta` dist-tag are supported.
+
+The npm package owner must separately authenticate and enroll `jdorado/ez_composio`
+and caller filename `publish-beta.yml`, with direct publication enabled and no
+environment (the shared job currently declares none). npm validates the caller
+identity for reusable workflows. Verify enrollment with npm settings or
+`npm trust list @jc_stack/ez-composio`; workflow merge does not establish trust.
+Keep npm tokens and private profiles out of Actions and test containers.
+
+Preserve Actions registry readback and artifact hash on the release record,
+then finish and read back the public GitHub prerelease and required installation
+QA. After uncertain publication, inspect registry state before retrying. Never
+publish to probe authentication, overwrite a version or promote to `latest`.
+
+The existing beta release work in PR #4 remains with its discovering worker.
+This setup does not change package versions or adopt its candidate. The current
+`beta.2.qa.1` source version is intentionally rejected by the shared publisher;
+prepare an approved `X.Y.Z-beta.N` release through the existing release process.
