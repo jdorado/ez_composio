@@ -38,7 +38,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "tag": "beta"
+    "tag": "latest"
   },
   "ezRelease": {
     "protocol": 1,

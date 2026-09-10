@@ -52,7 +52,7 @@ whose tag resolves to the tested current `main` commit. The receipt binds
 SHA-256 and public independent-review/test evidence URLs. Dispatch the caller
 on `main` with the numeric draft release ID, version, source SHA and independently
 verified SHA-256. Actions validates and publishes those bytes without rebuilding.
-Only `X.Y.Z-beta.N` and the `beta` dist-tag are supported.
+Only `X.Y.Z-beta.N` versions published to the `latest` dist-tag are supported.
 
 The npm package owner must separately authenticate and enroll `jdorado/ez_composio`
 and caller filename `publish-beta.yml`, with direct publication enabled and no
@@ -64,9 +64,7 @@ Keep npm tokens and private profiles out of Actions and test containers.
 Preserve Actions registry readback and artifact hash on the release record,
 then finish and read back the public GitHub prerelease and required installation
 QA. After uncertain publication, inspect registry state before retrying. Never
-publish to probe authentication, overwrite a version or promote to `latest`.
+publish to probe authentication or overwrite a version.
 
-The existing beta release work in PR #4 remains with its discovering worker.
-This setup does not change package versions or adopt its candidate. The current
-`beta.2.qa.1` source version is intentionally rejected by the shared publisher;
-prepare an approved `X.Y.Z-beta.N` release through the existing release process.
+Beta.2 is published. Future releases use the latest tag through the shared
+publisher; existing registry artifacts are immutable.
