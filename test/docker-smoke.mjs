@@ -30,7 +30,7 @@ async function install(){
 }
 try {
   await install();
-  assert.equal(ez(['composio','--version']).version,'0.1.0-beta.2.qa.1');
+  assert.equal(ez(['composio','--version']).version,JSON.parse(await readFile(join(source,'package.json'),'utf8')).version);
   operator(['src/configure.mjs','key','/state/broker.secret.json'],JSON.stringify({apiKey:'synthetic'}));
   operator(['src/provision.mjs','/state/broker.secret.json','/state/enrollment'],JSON.stringify({userId:'synthetic',broker:'unix:///ipc/composio.sock'}));
   const binding=dc(['exec','-T','broker','cat','/state/enrollment/binding.secret.json']);
