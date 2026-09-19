@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-beta.4
+
+- Add the required third-party notices to the source repository and published
+  package. Runtime behavior, provider boundaries and credentials are unchanged.
+- Testing beta; previously documented live-provider and fresh-host acceptance
+  limits remain.
+
 ## 0.1.0-beta.3
 
 - Adopt latest-tag publication and the corrected shared publisher main-CI selection. Runtime behavior and provider credentials are unchanged.
