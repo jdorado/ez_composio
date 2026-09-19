@@ -8,8 +8,9 @@ const version=spawnSync(process.execPath,['src/cli.mjs','--version'],{encoding:'
 assert.equal(version.status,0,version.stderr);
 assert.equal(JSON.parse(version.stdout).version,pkg.version);
 assert.equal(Object.keys(pkg.dependencies||{}).length,0);
+assert.ok(pkg.files.includes('THIRD_PARTY_NOTICES.md'),'package.json must ship THIRD_PARTY_NOTICES.md');
 const p=spawnSync('npm',['pack','--dry-run','--ignore-scripts','--json'],{encoding:'utf8'});
 assert.equal(p.status,0,p.stderr);const files=JSON.parse(p.stdout)[0].files.map(f=>f.path);
-for(const name of ['Dockerfile','.dockerignore','ez-plugin.json','ez-deployment.json','src/configure.mjs','skills/composio/SKILL.md','LICENSE'])assert.ok(files.includes(name),'Missing '+name);
+for(const name of ['Dockerfile','.dockerignore','ez-plugin.json','ez-deployment.json','src/configure.mjs','skills/composio/SKILL.md','LICENSE','THIRD_PARTY_NOTICES.md'])assert.ok(files.includes(name),'Missing '+name);
 assert.ok(!files.some(f=>/secret|enrollment|node_modules|\.git\//.test(f)));
 console.log('Release package contents and version verified');

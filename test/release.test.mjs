@@ -8,6 +8,13 @@ import {once} from 'node:events';
 import {server,digest,route} from '../src/broker.mjs';
 import {readJSON,save,socketRequest} from '../src/io.mjs';
 
+test('package ships the required third-party notices',async()=>{
+  const packageJson=JSON.parse(await readFile(new URL('../package.json',import.meta.url)));
+  const notices=await readFile(new URL('../THIRD_PARTY_NOTICES.md',import.meta.url),'utf8');
+  assert.ok(packageJson.files.includes('THIRD_PARTY_NOTICES.md'));
+  assert.match(notices,/^# Third-party notices/m);
+});
+
 test('invalid secret JSON is never reflected by CLI or provisioning',async()=>{
   for(const args of [['src/cli.mjs','init'],['src/provision.mjs','/unused','/unused']]) {
     const r=spawnSync(process.execPath,args,{encoding:'utf8',input:'synthetic-private-key-not-json'});
