@@ -141,7 +141,7 @@ data and are retained in the broker volume; back up/protect that volume.
 
 ## Verification and status
 
-`npm run verify` tests tenant isolation, unknown fields, secret handling and CLI
+`pnpm run verify` tests tenant isolation, unknown fields, secret handling and CLI
 HTTP behavior with a synthetic provider. Docker/manager smoke instructions are
 in `test/docker-smoke.mjs`. Live OAuth and provider actions require a deployed
 broker, project credentials and user consent; offline tests do not prove them.
