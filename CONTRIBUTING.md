@@ -17,8 +17,8 @@ unrepairable gate, product decision or material scope change.
 ## Contribution checks
 
 Read AGENTS.md. Use a dedicated worktree and branch from freshly fetched main.
-Keep one coherent change per PR. Run `npm ci`, `npm run verify`,
-`npm run release:check`, the packed Docker smoke and `git diff --check`.
+Keep one coherent change per PR. Run `pnpm install --frozen-lockfile`, `pnpm run verify`,
+`pnpm run release:check`, the packed Docker smoke and `git diff --check`.
 Use synthetic providers and isolated state; never reuse real credentials in tests.
 Open a draft PR with the tested commit, artifact hash and outstanding QA.
 Independent human or agent review and green CI precede an authorized merge.

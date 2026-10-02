@@ -4,7 +4,7 @@ Independent plugin; keep provider code out of the Ez relay. Native Node 22 APIs,
 no database or model loop. Agent decides which tools to discover/connect/use.
 Read README.md and skills/composio/SKILL.md before changing the interface.
 
-`npm run verify` tests the CLI/broker boundary with synthetic data.
+`pnpm run verify` tests the CLI/broker boundary with synthetic data.
 Read CONTRIBUTING.md before edits. `node test/docker-smoke.mjs` needs Docker and
 an explicit EZ_COMPOSIO_TEST_MANAGER path to a reviewed Ez manager.
 Keep all real credentials, enrollment files and receipts outside the repository.
