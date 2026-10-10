@@ -5,6 +5,9 @@ connection and native tool execution. Node 22 built-ins only; no dependencies.
 One alias, `ez composio`, keeps the agent context small. All toolkits remain
 searchable; availability and managed OAuth support depend on Composio.
 
+Requires Ez core 0.1.0-beta.50 or newer for the manifest example.
+Older cores refuse the update and retain the installed version.
+
 ## Architecture
 
 Agent CLI → private IPC broker (or hosted HTTPS) → agent-bound Composio session → connected provider.

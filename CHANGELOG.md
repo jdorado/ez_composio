@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-beta.5
+
+- Add a representative manifest example for tool discovery.
+- Verify the packed broker with the current manager project identity and regenerated Compose descriptor, using isolated synthetic provider state.
+- Requires Ez core 0.1.0-beta.50 or newer for the manifest example.
+  Older cores refuse the update and retain the installed version.
+
 ## 0.1.0-beta.4
 
 - Add the required third-party notices to the source repository and published
