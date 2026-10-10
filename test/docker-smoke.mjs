@@ -1,5 +1,5 @@
 // Isolated manager QA: packed source, synthetic provider, no real accounts.
-import {mkdtemp,mkdir,readFile,writeFile} from 'node:fs/promises';
+import {mkdtemp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
@@ -14,19 +14,27 @@ const invoke=(bin,args,input)=>{const r=spawnSync(bin,args,{encoding:'utf8',inpu
 const run=(args,input)=>JSON.parse(invoke(process.execPath,[manager,...args],input));
 run(['init','--home',join(root,'tools'),'--workspace',join(root,'mind'),'--catalog',join(root,'catalog.json')]);
 const ez=(args,input)=>run(['--home',join(root,'tools'),...args],input);
-const p=ez(['plugins','inspect','composio','--source',source]);let installed=false,compose;
-const dc=(args,input)=>invoke('docker',['compose','-f',compose,...args],input);
+const p=ez(['plugins','inspect','composio','--source',source]);let installed=false,compose,project;
+const fixture=join(root,'provider.compose.json');
+await writeFile(fixture,JSON.stringify({services:{broker:{
+  volumes:[{type:'bind',source:resolve('test/fake-provider.mjs'),target:'/fake-provider.mjs',read_only:true}],
+  environment:{NODE_OPTIONS:'--import=/fake-provider.mjs'}
+}}}));
+const dc=(args,input)=>invoke('docker',['compose','--project-name',project,'-f',compose,...args],input);
 const operator=(args,input)=>dc(['exec','-T','broker','node',...args],input);
+function start(){
+  ez(['plugins','start','composio']);
+  // The manager regenerates its descriptor. Keep provider injection in a test-only
+  // overlay and use the registry's project identity, just like the manager does.
+  dc(['-f',fixture,'up','-d','--wait']);
+}
 async function install(){
   ez(['plugins','install','composio','--source',source,'--revision',p.revision]);installed=true;
-  compose=ez(['plugins','list']).composio.compose;
+  ({compose,project}=ez(['plugins','list']).composio);
   const c=JSON.parse(await readFile(compose,'utf8'));
   assert.equal(c.services.plugin.network_mode,undefined);
   assert.ok(!c.services.plugin.volumes.some(v=>v.source==='broker'));
-  // Only test provider injection; no networking changes to the generated deployment.
-  c.services.broker.volumes.push({type:'bind',source:resolve('test/fake-provider.mjs'),target:'/fake-provider.mjs',read_only:true});
-  c.services.broker.environment={NODE_OPTIONS:'--import=/fake-provider.mjs'};
-  await writeFile(compose,JSON.stringify(c));ez(['plugins','start','composio']);
+  start();
 }
 try {
   await install();
@@ -42,10 +50,12 @@ try {
   assert.equal(ez(['composio','file-upload-request'],JSON.stringify({key:'synthetic-upload',toolkit_slug:'googledrive',tool_slug:'GOOGLEDRIVE_CREATE_FILE',filename:'empty.txt',mimetype:'text/plain',md5:'d41d8cd98f00b204e9800998ecf8427e'})).result.key,'synthetic-object');
   assert.ok(ez(['composio','search','calendar']).results);
   assert.ok(ez(['composio','schemas','GMAIL_FETCH_EMAILS']).data);
-  ez(['plugins','stop','composio']);ez(['plugins','start','composio']);assert.equal(ez(['composio','doctor']).total_items,0);
+  ez(['plugins','stop','composio']);start();assert.equal(ez(['composio','doctor']).total_items,0);
   await install();assert.equal(ez(['composio','doctor']).total_items,0);
   operator(['src/configure.mjs','revoke','/state/broker.secret.json'],JSON.stringify({hash:Object.keys(JSON.parse(binding))[0]}));
   assert.throws(()=>ez(['composio','doctor']),/401/);
   console.log(JSON.stringify({verified:true,root,revision:p.revision,checks:['packed-install','private-ipc','key-isolation','discovery','restart','reinstall','atomic-revocation']}));
-} finally {if(installed)ez(['plugins','uninstall','composio']);}
-// Manager intentionally retains synthetic volumes for inspection.
+} finally {
+  if(installed){ez(['plugins','uninstall','composio']);dc(['down','--volumes']);}
+  await rm(root,{recursive:true,force:true});
+}
