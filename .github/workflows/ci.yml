@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: jdorado/ez-agents
-          ref: 51dbc778fc7e598142ecddcc1e9c4eab6c1abab4
+          ref: e65188147f83ecd33a5b14cdea293b2914b53837
           path: .qa-manager
       - name: Packed manager install and private broker QA
         run: |
