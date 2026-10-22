@@ -5,7 +5,7 @@ npm runtime dependencies and uses only Node.js built-in APIs in the published
 package; no third-party npm source or `node_modules` tree is bundled.
 
 The Docker image is built from the pinned official Node.js
-`22.22.0-bookworm-slim` base image. Node.js is MIT licensed; the Debian base
+`22.23.4-bookworm-slim` base image. Node.js is MIT licensed; the Debian base
 components retain their own copyright and license terms and notices in the
 image. This repository publishes source and Docker build instructions, not a
 prebuilt container image, so any operator-built image remains subject to those
@@ -18,5 +18,5 @@ separately to each operator's use of that service.
 
 Upstream references:
 
-- Node.js license: https://github.com/nodejs/node/blob/v22.22.0/LICENSE
+- Node.js license: https://github.com/nodejs/node/blob/v22.23.4/LICENSE
 - Node.js container image: https://github.com/nodejs/docker-node
