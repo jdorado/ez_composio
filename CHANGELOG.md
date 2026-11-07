@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-beta.6
+
+- Ship the October 2026 Node runtime security update (Docker base image and
+  third-party notices) to the public channel. Runtime behavior, provider
+  boundaries and credentials are unchanged.
+- Beta.5 was staged but never published to npm; this release supersedes it and
+  carries its changes. Still requires Ez core 0.1.0-beta.50 or newer.
+
 ## 0.1.0-beta.5
 
 - Add a representative manifest example for tool discovery.
